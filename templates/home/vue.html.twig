@@ -1,9 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Article n°{{ id }}{% endblock %}
+{% block title %}{{ article.title }}{% endblock %}
 {% block body %} 
+<div class="container">
+<h1>{{ article.title }}</h1>
+<small>{{ article.createdAt|date }}</small>
+<p>{{ article.content }}</p>
 
-{% include 'menu/_menu.html.twig' %}
-<h1>Article n° {{ id }}</h1>
-<p>Contenue de l'article</p>
+<h2>Commentaires</h2>
+<div class="row">
+{% for comment in article.comments %}
+     <div class="col-md-12">
+     <small>{{ comment.createdAt|date("d/m/Y") }} par {{ comment.author }}</small>
+     <p>{{ comment.content }}</p>
+     </div>
+     {% endfor %}
+     </div>
+     </div>
 {% endblock %}

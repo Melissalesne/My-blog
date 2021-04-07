@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un article{% endblock %}
+
+{% block body %}
+<div class="container">
+<h3>Ajouter un article</h3>
+{{ form_start(form) }}
+    {{ form_label(form.title) }}
+    {{ form_widget(form.title) }}
+
+    {{ form_label(form.content) }}
+    {{ form_widget(form.content) }}
+
+    {{ form_label(form.createdAt) }}
+    {{ form_widget(form.createdAt) }}
+
+    {{ form_rest(form) }}
+    <button type"submit" class="btn btn-success mt-3">Enregistrer</button>
+    </div>
+
+{% endblock %}
