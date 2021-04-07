@@ -7,7 +7,9 @@
 {% include 'menu/_menu.html.twig' %}
 <h1>Liste de nos articles</h1>
 
+{{ articles|taille }}
+
 {% for article in articles %}
-   <a href="{{ path('vue_article', { 'id':article['id'] }) }}"> article['url'] }}">{{ article['nom'] }}</a>
+   <a href="{{ path('vue_article', { 'id':article['id'] }) }}">{{ article['nom'] }}</a>
    {% endfor %}
 {% endblock %}

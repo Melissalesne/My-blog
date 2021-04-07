@@ -2,9 +2,12 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\Article;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\DateTime;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class HomeController extends AbstractController
 {
@@ -55,5 +58,14 @@ class HomeController extends AbstractController
         return $this->render('home/vue.html.twig', [
             'id' => $id
         ]);
+    }
+     
+    // Qui permet d'ajouter des articles
+    /**
+     * @Route("/article/add", name="add_article")
+     */
+    public function add() 
+    {
+        
     }
 }
