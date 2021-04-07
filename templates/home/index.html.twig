@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Listes des Articles{% endblock %}
+
+{% block body %}
+
+{% include 'menu/_menu.html.twig' %}
+<h1>Liste de nos articles</h1>
+
+{% for article in articles %}
+   <a href="{{ path('vue_article', { 'id':article['id'] }) }}"> article['url'] }}">{{ article['nom'] }}</a>
+   {% endfor %}
+{% endblock %}
