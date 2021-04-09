@@ -6,8 +6,10 @@ use App\Entity\Article;
 use App\Entity\Comment;
 use App\Form\ArticleType;
 use App\Form\CommentType;
+use Psr\Log\LoggerInterface;
 use App\Repository\ArticleRepository;
 use App\Repository\CategoryRepository;
+use App\Service\VerificationComment;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 class HomeController extends AbstractController
 {
@@ -37,7 +40,7 @@ class HomeController extends AbstractController
      /**
      * @Route("/{id}", name="vue_article", requirements={"id"="\d+"}, methods={"GET", "POST"})
      */
-    public function vueArticle(Article $article, Request $request, EntityManagerInterface $manager) 
+    public function vueArticle(Article $article, Request $request, EntityManagerInterface $manager, VerificationComment $verificationComment, FlashBagInterface $session) 
     {
         // Créer l'objet Comment 
         $comment = new Comment();
@@ -49,11 +52,22 @@ class HomeController extends AbstractController
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
-            
-            $manager->persist($comment);
-            $manager->flush();
 
-            return $this->redirectToRoute('vue_article', ['id' => $article->getId()]);
+            // Verifier si le commentaire ne contient pas de mot non autorisé 
+
+            if($verificationComment->commentaireNonAutorise($comment) === false){
+
+                $manager->persist($comment);
+                $manager->flush();
+    
+                return $this->redirectToRoute('vue_article', ['id' => $article->getId()]);
+
+            }
+            else{
+                $session->add("danger", "Le commentaire contient un mot  interdit");
+            }
+            
+        
         }
       
 
@@ -69,6 +83,7 @@ class HomeController extends AbstractController
      */
     public function add(Request $request, EntityManagerInterface $manager) 
     {
+        
         // Créer une nouvel entité 
         $article = new Article();
 
