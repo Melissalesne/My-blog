@@ -3,6 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Entity\Comment;
+use App\Form\ArticleType;
+use App\Form\CommentType;
 use App\Repository\ArticleRepository;
 use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -32,16 +35,31 @@ class HomeController extends AbstractController
     }
     // Qui affichera un article
      /**
-     * @Route("/{id}", name="vue_article", requirements={"id"="\d+"}, methods={"GET"})
+     * @Route("/{id}", name="vue_article", requirements={"id"="\d+"}, methods={"GET", "POST"})
      */
-    public function vueArticle(ArticleRepository $articleRepository, $id) 
+    public function vueArticle(Article $article, Request $request, EntityManagerInterface $manager) 
     {
-        $article = $articleRepository->findByDateCreation(new \DateTime());
+        // Créer l'objet Comment 
+        $comment = new Comment();
+        $comment->setArticle($article);
+       
 
-        $article = $articleRepository->find($id);
+        $form = $this->createForm(CommentType::class, $comment);
+
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            
+            $manager->persist($comment);
+            $manager->flush();
+
+            return $this->redirectToRoute('vue_article', ['id' => $article->getId()]);
+        }
+      
 
         return $this->render('home/vue.html.twig', [
-            'article' => $article
+            'article' => $article,
+            'form' => $form->createView()
         ]);
     }
      
@@ -49,23 +67,22 @@ class HomeController extends AbstractController
     /**
      * @Route("/article/add", name="add_article")
      */
-    public function add(Request $request, CategoryRepository $categoryRepository, EntityManagerInterface $manager) 
+    public function add(Request $request, EntityManagerInterface $manager) 
     {
-       $form = $this->createFormBuilder()
-       ->add('title', TextType::class, [
-           'label' => "Titre de l'article"
-       ])
-       ->add('content', TextareaType::class)
-       ->add('createdAt', DateType::class, [
-           'widget' => 'single_text',
-           'input' => 'datetime'
-       ])
+        // Créer une nouvel entité 
+        $article = new Article();
 
-       ->getForm();
-
+         $form = $this->createForm(ArticleType::class, $article);
+    
        $form->handleRequest($request);
+
        // Je verifie si le form est soumis et si il est valide
        if($form->isSubmitted() && $form->isValid()){
+
+        $manager->persist($article);
+        $manager->flush();
+
+        return $this->redirectToRoute('liste_articles');
           
         // Créer un nouvel article 
            $article = new Article();
